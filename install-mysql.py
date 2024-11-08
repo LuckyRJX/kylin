@@ -5,22 +5,22 @@ import subprocess
 import os
 import pwd
 import grp
-import sys
-
+mysql_port="3306"
 mysql_dir = "/opt/mysql"
 download = "/opt/download"
-mysql_data = f"{mysql_dir}/data"
+mysql_data=f"{mysql_dir}/data"
 mysql_user = "mysql"
-mysql_cnf="/opt/mysql/my.cnf"
+mysql_cnf=f"{mysql_dir}/my.cnf"
+mysq_socket=f"{mysql_dir}/run/socket.sock"
 lines=f"""[mysql]
-socket=/tmp/mysql.sock
+socket={mysq_socket}
 [mysqld]
 #基础设置
 user={mysql_user}
-port=3306
+port={mysql_port}
 basedir={mysql_dir}
 datadir={mysql_data}
-socket=/tmp/mysql.sock
+socket={mysq_socket}
 bind-address=0.0.0.0
 lower_case_table_names=1
 character-set-server=utf8mb4
@@ -108,7 +108,7 @@ innodb_log_buffer_size = 16M
 innodb_redo_log_capacity=536870912
 #数据包或生成的/中间的字符串的最大大小（以字节为单位）。
 [client]
-socket=/tmp/mysql.sock"""
+socket={mysq_socket}"""
 
 
 def init_dir():
@@ -153,7 +153,7 @@ def install_mysql(mysql_version, c_version=""):
     else:
         print(f"安装包已存在:{mysql_file}")
 
-    if not isdir(f'/opt/mysql'):
+    if not isdir(f'{mysql_dir}'):
         #解压
         command = ["sudo", "tar", "-xvf", f"{download}/{mysql_file}", "-C", "/opt"]
         exec_with(command)
@@ -168,17 +168,17 @@ def install_mysql(mysql_version, c_version=""):
     result = subprocess.run(command)
     mkdir(mysql_data)
     os.chown(mysql_data,uid=get_user_id(mysql_user),gid=get_gid(mysql_user))
-    mkdir("/opt/mysql/run")
-    mkdir("/opt/mysql/log")
-    mkdir("/opt/mysql/log/log_bin")
-    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", "/opt/mysql/run"])
-    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", "/opt/mysql/log"])
-    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", "/opt/mysql/log/log_bin"])
+    mkdir(f"{mysql_dir}/run")
+    mkdir(f"{mysql_dir}/log")
+    mkdir(f"{mysql_dir}/log/log_bin")
+    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", f"{mysql_dir}/run"])
+    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", f"{mysql_dir}/log"])
+    subprocess.run(["sudo", "chown", "-R", f"{mysql_user}:{mysql_user}", f"{mysql_dir}/log/log_bin"])
     init_cnf(mysql_cnf)
     command=[f"{mysql_dir}/bin/mysqld", f"--defaults-file={mysql_cnf}", "--initialize-insecure", f"--user={mysql_user}", f"--basedir={mysql_dir}",f"--datadir={mysql_data}"]
     exec_with(command)
     print("密码为空")
-    exec_with(["cat",f"/opt/mysql/log/error.log"])
+    exec_with(["cat",f"{mysql_dir}/log/error.log"])
     exec_with(["cp", f"{mysql_dir}/support-files/mysql.server",f"{mysql_dir}"])
     f = open(f'{mysql_dir}/mysql.server', 'r+')
     flist = f.readlines()
