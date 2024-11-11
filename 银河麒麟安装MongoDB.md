@@ -21,7 +21,7 @@
 #### 安装依赖
 
 ```shell
-sudo yum install libcurl openssl xz-libs
+sudo yum install libcurl openssl xz-libs -y
 ```
 
 #### 下载包
