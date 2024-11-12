@@ -53,6 +53,8 @@ mv /opt/mysql-8.0.39-linux-glibc2.28-x86_64 /opt/mysql
 chown root:root -R /opt/mysql
 ```
 
+
+
 ### 创建用户和用户组
 
 ```shell
@@ -68,30 +70,30 @@ chown mysql:mysql -R /opt/mysql/data
 
 ```shell
 [mysql]
-socket=/tmp/mysql.sock
+socket=/opt/mysql/run/socket.sock
 [mysqld]
 #基础设置
-user={mysql_user}
+user=mysql
 port=3306
-basedir={mysql_dir}
-datadir={mysql_data}
-socket=/tmp/mysql.sock
+basedir=/opt/mysql
+datadir=/opt/mysql/data
+socket=/opt/mysql/run/socket.sock
 bind-address=0.0.0.0
 lower_case_table_names=1
 character-set-server=utf8mb4
 collation-server=utf8mb4_general_ci
 
-pid-file={mysql_dir}/run/mysqld.pid
-log_error={mysql_dir}/log/error.log
+pid-file=/opt/mysql/run/mysqld.pid
+log_error=/opt/mysql/log/error.log
 
 # 启用二进制日志
 server-id=1
-log_bin={mysql_dir}/log/log_bin/mysql_bin
+log_bin=/opt/mysql/log/log_bin/mysql_bin
 binlog_expire_logs_seconds=604800
 
 # 开启慢查询日志
 slow_query_log=ON
-slow_query_log_file={mysql_dir}/log/mysql-slow.log
+slow_query_log_file=/opt/mysql/log/mysql-slow.log
 long_query_time=2
 
 skip_name_resolve=1
@@ -163,8 +165,17 @@ innodb_log_buffer_size = 16M
 innodb_redo_log_capacity=536870912
 #数据包或生成的/中间的字符串的最大大小（以字节为单位）。
 [client]
-socket=/tmp/mysql.sock
+socket=/opt/mysql/run/socket.sock
 ```
+
+### 创建目录
+
+```shell
+mkdir -p /opt/mysql/{run,log/log_bin}
+chown -R mysql:mysql /opt/mysql/{run,log}
+```
+
+
 
 ### 初始化数据库
 
