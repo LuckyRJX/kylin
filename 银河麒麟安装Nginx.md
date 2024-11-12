@@ -46,7 +46,7 @@ sudo useradd nginx -g nginx -s /sbin/nologin -M
 #### 编译安装
 
 ```shell
-cd nginx1.26.2
+cd nginx-1.26.2
 
 mkdir -p /opt/nginx
 
