@@ -60,8 +60,6 @@ chown root:root -R /opt/mysql
 ```shell
 groupadd mysql
 useradd -r -g mysql mysql
-mkdir -p /opt/mysql/data/
-chown mysql:mysql -R /opt/mysql/data
 ```
 
 ### 配置文件
@@ -171,8 +169,8 @@ socket=/opt/mysql/run/socket.sock
 ### 创建目录
 
 ```shell
-mkdir -p /opt/mysql/{run,log/log_bin}
-chown -R mysql:mysql /opt/mysql/{run,log}
+mkdir -p /opt/mysql/{run,log/log_bin,data}
+chown -R mysql:mysql /opt/mysql/{run,log,data}
 ```
 
 
@@ -193,8 +191,14 @@ cp /opt/mysql/support-files/mysql.server /opt/mysql/
 basedir=/opt/mysql
 datadir=/opt/mysql/data
 
+
+
 /opt/mysql/mysql.server start
 /opt/mysql/mysql.server restart
 /opt/mysql/mysql.server stop
+#链接
+/opt/mysql/bin/mysql --socket=/opt/mysql/run/socket.sock
+#修改密码
+/opt/mysql/bin/mysqladmin -uroot -p password 123456  --socket=/opt/mysql/run/socket.sock
 ```
 
